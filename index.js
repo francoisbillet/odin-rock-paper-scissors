@@ -16,57 +16,49 @@ const youWin = (playerSelection, computerSelection) =>
 const youLose = (playerSelection, computerSelection) =>
   `You Lose ! ${computerSelection} beats ${playerSelection}`;
 
+// Event listeners and main function
+
+let playerCount = 0;
+let computerCount = 0;
+const divElement = document.getElementById("results");
+const divElementResult = document.querySelector("#finalResult");
+
+const playGame = (event) => {
+  divElementResult.innerHTML = "";
+  const roundResult = playRound(event.target.textContent, getComputerPlay());
+  const winner = getWinner(roundResult);
+
+  switch (winner) {
+    case PLAYER:
+      playerCount++;
+      divElement.innerHTML += `You win this round <br>`;
+      break;
+    case COMPUTER:
+      computerCount++;
+      divElement.innerHTML += `You lose this round <br>`;
+      break;
+    case TIE:
+      divElement.innerHTML += `It's a tie for this round <br>`;
+      break;
+  }
+  if (playerCount === 5 || computerCount === 5) {
+    divElementResult.innerHTML = reportWinner(playerCount, computerCount);
+    divElement.innerHTML = "";
+    playerCount = 0;
+    computerCount = 0;
+  }
+};
+
+const buttonElements = document.querySelectorAll("button");
+buttonElements.forEach((buttonElement) => {
+  buttonElement.addEventListener("click", (event) => playGame(event));
+});
+
 // Inputs/Plays-related
 
 const getComputerPlay = () => {
   const randomIndex = Math.floor(Math.random() * playPossibilities.length);
   return playPossibilities[randomIndex];
-};
-
-const getPlayerInput = (roundNumber) => {
-  let playerInput;
-  do {
-    playerInput = prompt(`Round ${roundNumber}: Rock, Paper or Scissors ?`);
-    playerInput = sanitizeInput(playerInput);
-  } while (!inputIsCorrect(playerInput));
-  return playerInput;
-};
-
-const sanitizeInput = (playerInput) => {
-  return playerInput
-    .charAt(0)
-    .toUpperCase()
-    .concat(playerInput.substring(1).toLowerCase());
-};
-
-const inputIsCorrect = (playerInput) => {
-  return playPossibilities.includes(playerInput);
-};
-
-// Main function
-
-const game = () => {
-  let playerCount = 0;
-  let computerCount = 0;
-  for (let i = 0; i < 5; i++) {
-    const playerInput = getPlayerInput(i + 1);
-    const roundResult = playRound(playerInput, getComputerPlay());
-    const winner = getWinner(roundResult);
-    switch (winner) {
-      case PLAYER:
-        playerCount++;
-        console.log(`You win round ${i + 1}`);
-        break;
-      case COMPUTER:
-        computerCount++;
-        console.log(`You lose round ${i + 1}`);
-        break;
-      case TIE:
-        console.log(`It's a tie for round ${i + 1}`);
-        break;
-    }
-  }
-  console.log(reportWinner(playerCount, computerCount));
 };
 
 // Round-Related
@@ -144,5 +136,3 @@ const reportWinner = (playerCount, computerCount) => {
     return `It's a tie ! Final result: ${playerCount} - ${computerCount}`;
   }
 };
-
-game();
